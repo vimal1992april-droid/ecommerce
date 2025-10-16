@@ -1,42 +1,49 @@
-# 🛍️ Single Vendor eCommerce Website with Admin Panel
+# 🛍️ Single Vendor eCommerce Website (Ruby on Rails)
 
-A full-featured **Single Vendor eCommerce Website** built to make online selling easy and efficient.  
-This project includes a **user-friendly storefront** and a **powerful admin panel** to manage products, orders, users, and more — all from one place.
+A full-featured **Single-Vendor eCommerce Platform** built with **Ruby on Rails**.  
+It provides a **modern shopping experience** for customers and a **powerful admin panel** for managing products, categories, users, and orders — all from one dashboard.
 
 ---
 
 ## 🚀 Features
 
-### 🛒 Frontend (User Side)
-- Modern and responsive design
-- Browse products by category
+### 🛒 Storefront (User Side)
+- Responsive and mobile-friendly design
+- Product browsing and filtering
 - Add to cart and checkout
 - Order tracking
-- Secure user authentication
-- Email notifications
+- Secure user registration and login (Devise)
+- Email confirmations and notifications
 
 ### ⚙️ Admin Panel
-- Dashboard overview (sales, orders, revenue)
-- Product management (add, edit, delete)
-- Category management
-- Order management and status updates
-- User management
-- Reports & analytics
+- Dashboard with sales and order insights
+- Manage products, categories, and users
+- Order management (view, update status, delete)
+- Inventory tracking
+- View sales reports
+- Role-based access (admin vs. customer)
 
 ---
 
 ## 🧩 Tech Stack
 
-| Layer | Technology Used |
-|-------|------------------|
-| **Frontend** | React / Bootstrap / Tailwind CSS |
-| **Backend** | Laravel / Ruby on Rails *(choose one depending on your setup)* |
-| **Database** | MySQL |
-| **Authentication** | Laravel Breeze / Devise (Rails) |
-| **Storage** | AWS S3 or local |
-| **Payment Gateway** | Stripe / Razorpay |
-| **Deployment** | Vercel / Render / AWS EC2 |
+| Layer | Technology |
+|-------|-------------|
+| **Framework** | Ruby on Rails 7+ |
+| **Frontend** | ERB / Turbo / Stimulus / Bootstrap / Tailwind CSS |
+| **Database** | MySQL / PostgreSQL |
+| **Authentication** | Devise |
+| **Authorization** | CanCanCan |
+| **File Storage** | Active Storage (local / AWS S3) |
+| **Background Jobs** | Sidekiq / Delayed Job |
+| **Payments** | Stripe / Razorpay (optional) |
+| **Admin Interface** | Rails Admin / ActiveAdmin |
 
 ---
 
 ## ⚙️ Installation & Setup
+
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/your-username/ecommerce-rails.git
+cd ecommerce-rails
