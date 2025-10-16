@@ -45,5 +45,5 @@ It provides a **modern shopping experience** for customers and a **powerful admi
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/your-username/ecommerce-rails.git
-cd ecommerce-rails
+git clone https://github.com/vimal1992april-droid/ecommerce.git
+cd ecommerce
