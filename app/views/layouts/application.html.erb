@@ -20,10 +20,16 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <!-- Font Awesome via CDN (safe, working) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
   </head>
 
   <body>
     <main class="container mx-auto mt-28 px-5 flex">
+      <!-- app/views/layouts/application.html.erb -->
+      <p class="notice"><%= notice %></p>
+      <p class="alert"><%= alert %></p>
       <%= yield %>
     </main>
   </body>
