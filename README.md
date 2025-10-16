@@ -1,25 +1,49 @@
-# README
+# 🛍️ Single Vendor eCommerce Website (Ruby on Rails)
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A full-featured **Single-Vendor eCommerce Platform** built with **Ruby on Rails**.  
+It provides a **modern shopping experience** for customers and a **powerful admin panel** for managing products, categories, users, and orders — all from one dashboard.
 
-Things you may want to cover:
+---
 
-* Ruby version
+## 🚀 Features
 
-* System dependencies
+### 🛒 Storefront (User Side)
+- Responsive and mobile-friendly design
+- Product browsing and filtering
+- Add to cart and checkout
+- Order tracking
+- Secure user registration and login (Devise)
+- Email confirmations and notifications
 
-* Configuration
+### ⚙️ Admin Panel
+- Dashboard with sales and order insights
+- Manage products, categories, and users
+- Order management (view, update status, delete)
+- Inventory tracking
+- View sales reports
+- Role-based access (admin vs. customer)
 
-* Database creation
+---
 
-* Database initialization
+## 🧩 Tech Stack
 
-* How to run the test suite
+| Layer | Technology |
+|-------|-------------|
+| **Framework** | Ruby on Rails 7+ |
+| **Frontend** | ERB / Turbo / Stimulus / Bootstrap / Tailwind CSS |
+| **Database** | MySQL / PostgreSQL |
+| **Authentication** | Devise |
+| **Authorization** | CanCanCan |
+| **File Storage** | Active Storage (local / AWS S3) |
+| **Background Jobs** | Sidekiq / Delayed Job |
+| **Payments** | Stripe / Razorpay (optional) |
+| **Admin Interface** | Rails Admin / ActiveAdmin |
 
-* Services (job queues, cache servers, search engines, etc.)
+---
 
-* Deployment instructions
+## ⚙️ Installation & Setup
 
-* ...
-# ecommerce
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/vimal1992april-droid/ecommerce.git
+cd ecommerce
