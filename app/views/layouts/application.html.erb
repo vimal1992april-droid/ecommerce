@@ -30,6 +30,14 @@
       <!-- app/views/layouts/application.html.erb -->
       <p class="notice"><%= notice %></p>
       <p class="alert"><%= alert %></p>
+
+      <% if admin_signed_in? %>
+        <%= link_to "Admin Dashboard", admin_root_path %>
+        <%= button_to "Logout", destroy_admin_session_path, method: :delete %>
+      <% else %>
+        <%= link_to "Admin Login", new_admin_session_path  %>
+      <% end %>
+
       <%= yield %>
     </main>
   </body>
