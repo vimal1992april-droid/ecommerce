@@ -1,0 +1,66 @@
+<!-- app/views/admin/dynamic_crud/index.html.erb -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <h1 class="text-2xl font-bold mb-4"><%= @model.name.pluralize %></h1>
+
+  <!-- Action Buttons -->
+  <div class="flex gap-2 mb-4">
+    <% if @model.crud_options[:add] %>
+      <%= link_to "Add New #{@model}", admin_dynamic_crud_new_path(model: params[:model]), class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" %>
+    <% end %>
+
+    <% if @model.crud_options[:import] %>
+      <%= link_to "Import CSV", admin_dynamic_crud_import_path(model: params[:model]), class: "px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600" %>
+    <% end %>
+
+    <% if @model.crud_options[:export] %>
+      <%= link_to "Export CSV", admin_dynamic_crud_export_path(model: params[:model]), class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" %>
+    <% end %>
+  </div>
+
+  <!-- Table -->
+  <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <table class="min-w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <% @model.column_names.each do |col| %>
+            <th scope="col" class="px-6 py-3">
+              <%= col.humanize %>
+            </th>
+          <% end %>
+
+          <% if @model.crud_options[:edit] %>
+            <th scope="col" class="px-6 py-3">Actions</th>
+          <% end %>
+          <% if @model.crud_options[:delete] %>
+            <th scope="col" class="px-6 py-3">Actions</th>
+          <% end %>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @resources.each_with_index do |r, index| %>
+          <tr class="<%= index.even? ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900' %> border-b dark:border-gray-700 border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <% @model.column_names.each_with_index do |col, i| %>
+              <td class="px-6 py-4 whitespace-nowrap text-sm <%= i == 0 ? 'font-medium text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300' %>">
+                <%= r.send(col) %>
+              </td>
+            <% end %>
+
+            <% if @model.crud_options[:edit] %>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
+                <%= link_to "Edit", admin_dynamic_crud_edit_path(model: params[:model], id: r.id), class: "text-blue-600 dark:text-blue-500 hover:underline" %>
+              </td>
+            <% end %>
+            <% if @model.crud_options[:delete] %>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
+                <%= link_to "Delete", admin_dynamic_crud_destroy_path(model: params[:model], id: r.id), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 dark:text-red-500 hover:underline" %>
+              </td>
+            <% end %>
+
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+</div>
