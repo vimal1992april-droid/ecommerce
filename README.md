@@ -1,25 +1,42 @@
-# README
+# 🛍️ Single Vendor eCommerce Website with Admin Panel
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A full-featured **Single Vendor eCommerce Website** built to make online selling easy and efficient.  
+This project includes a **user-friendly storefront** and a **powerful admin panel** to manage products, orders, users, and more — all from one place.
 
-Things you may want to cover:
+---
 
-* Ruby version
+## 🚀 Features
 
-* System dependencies
+### 🛒 Frontend (User Side)
+- Modern and responsive design
+- Browse products by category
+- Add to cart and checkout
+- Order tracking
+- Secure user authentication
+- Email notifications
 
-* Configuration
+### ⚙️ Admin Panel
+- Dashboard overview (sales, orders, revenue)
+- Product management (add, edit, delete)
+- Category management
+- Order management and status updates
+- User management
+- Reports & analytics
 
-* Database creation
+---
 
-* Database initialization
+## 🧩 Tech Stack
 
-* How to run the test suite
+| Layer | Technology Used |
+|-------|------------------|
+| **Frontend** | React / Bootstrap / Tailwind CSS |
+| **Backend** | Laravel / Ruby on Rails *(choose one depending on your setup)* |
+| **Database** | MySQL |
+| **Authentication** | Laravel Breeze / Devise (Rails) |
+| **Storage** | AWS S3 or local |
+| **Payment Gateway** | Stripe / Razorpay |
+| **Deployment** | Vercel / Render / AWS EC2 |
 
-* Services (job queues, cache servers, search engines, etc.)
+---
 
-* Deployment instructions
-
-* ...
-# ecommerce
+## ⚙️ Installation & Setup
