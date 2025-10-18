@@ -1,0 +1,14 @@
+<div>
+  <label class="block text-gray-700 font-medium mb-2">
+    <%= column.name.titleize %>
+  </label>
+
+  <div class="flex space-x-6">
+    <% f.object.class.defined_enums[column.name].keys.each do |option| %>
+      <label class="inline-flex items-center space-x-2">
+        <%= f.radio_button column.name, option, class: "text-blue-600 focus:ring-blue-500 border-gray-300" %>
+        <span class="text-gray-700 capitalize"><%= option.humanize %></span>
+      </label>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+<% assoc_model = column.name.sub("_id", "").classify.safe_constantize %>
+<div>
+  <label class="block text-gray-700 font-medium mb-1"><%= column.name.titleize %></label>
+  <% if assoc_model.present? %>
+    <%= f.collection_select column.name, assoc_model.all, :id, :name,
+          { prompt: "Select #{assoc_model.model_name.human}" },
+          class: "border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-200 focus:border-blue-500" %>
+  <% else %>
+    <%= f.number_field column.name, class: "border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-200 focus:border-blue-500" %>
+  <% end %>
+</div>

@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-gray-50 py-10 px-4">
+  <div class="max-w-3xl mx-auto bg-white shadow rounded-lg p-6 border border-gray-200">
+
+    <h1 class="text-2xl font-semibold text-gray-800 mb-6">
+      Add <%= params[:model].titleize %>
+    </h1>
+
+    <% if @resource.errors.any? %>
+      <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <h2 class="text-red-700 font-semibold mb-2">
+          <%= pluralize(@resource.errors.count, "error") %> prohibited this record from being saved:
+        </h2>
+        <ul class="list-disc pl-5 text-red-600 text-sm">
+          <% @resource.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with(model: @resource, url: admin_dynamic_crud_create_path(model: params[:model]), local: true, html: { multipart: true }) do |f| %>
+      <div class="grid grid-cols-2 gap-4">
+
+        <% @model_class.columns.each do |column| %>
+          <% next if ["id", "created_at", "updated_at"].include?(column.name) %>
+
+          <% field_type = 
+            if @model_class.defined_enums.keys.include?(column.name)
+              "select_field"
+            elsif column.name.ends_with?("_id")
+              "foreign_key_field"
+            elsif column.type == :boolean
+              "boolean_field"
+            elsif column.type == :text
+              "text_area"
+            elsif [:integer, :float, :decimal].include?(column.type)
+              "number_field"
+            elsif [:date, :datetime].include?(column.type)
+              "date_field"
+            elsif @model_class.reflect_on_attachment(column.name)
+              "file_field"
+            elsif column.type == :boolean
+              "checkbox_field"
+            elsif @model_class.defined_enums.keys.include?(column.name)
+              "radio_field"
+            else
+              "text_field"
+            end
+          %>
+
+          <%= render "admin/shared/form_fields/#{field_type}", f: f, column: column, model_class: @model_class %>
+        <% end %>
+
+        <div class="flex justify-end mt-6">
+          <%= f.submit "Create #{params[:model].titleize}", class: "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition" %>
+        </div>
+
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -11,6 +11,8 @@ class Admin::DynamicCrudController < ApplicationController
 
   # GET /admin/:model/new
   def new
+    #render json: @model.new
+    @model_class = params[:model].classify.safe_constantize
     @resource = @model.new
   end
 

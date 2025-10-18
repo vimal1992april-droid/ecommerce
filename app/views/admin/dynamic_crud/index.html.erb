@@ -1,5 +1,5 @@
 <!-- app/views/admin/dynamic_crud/index.html.erb -->
-<div class="p-6 bg-gray-100 min-h-screen">
+<div class="p-4 bg-gray-100 min-h-screen">
   <h1 class="text-2xl font-bold mb-4"><%= @model.name.pluralize %></h1>
 
   <!-- Action Buttons -->
@@ -28,10 +28,7 @@
             </th>
           <% end %>
 
-          <% if @model.crud_options[:edit] %>
-            <th scope="col" class="px-6 py-3">Actions</th>
-          <% end %>
-          <% if @model.crud_options[:delete] %>
+          <% if @model.crud_options[:edit] || @model.crud_options[:delete] %>
             <th scope="col" class="px-6 py-3">Actions</th>
           <% end %>
         </tr>
@@ -46,17 +43,14 @@
               </td>
             <% end %>
 
-            <% if @model.crud_options[:edit] %>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
-                <%= link_to "Edit", admin_dynamic_crud_edit_path(model: params[:model], id: r.id), class: "text-blue-600 dark:text-blue-500 hover:underline" %>
-              </td>
-            <% end %>
-            <% if @model.crud_options[:delete] %>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
-                <%= link_to "Delete", admin_dynamic_crud_destroy_path(model: params[:model], id: r.id), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 dark:text-red-500 hover:underline" %>
-              </td>
-            <% end %>
-
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
+              <% if @model.crud_options[:edit] %>
+                  <%= link_to "Edit", admin_dynamic_crud_edit_path(model: params[:model], id: r.id), class: "text-blue-600 dark:text-blue-500 hover:underline" %>
+              <% end %>
+              <% if @model.crud_options[:delete] %>
+                  <%= button_to "Delete", admin_dynamic_crud_destroy_path(model: params[:model], id: r.id), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 dark:text-red-500 hover:underline" %>
+              <% end %>
+             </td>
           </tr>
         <% end %>
       </tbody>

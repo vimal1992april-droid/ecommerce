@@ -1,0 +1,30 @@
+<div>
+  <label class="block text-gray-700 font-medium mb-2">
+    <%= column.name.titleize %>
+  </label>
+
+  <div class="flex items-center space-x-3">
+    <label class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm transition">
+      Choose File
+      <%= f.file_field column.name, direct_upload: true, class: "hidden" %>
+    </label>
+
+    <% if f.object.send(column.name).attached? %>
+      <span class="text-gray-600 text-sm truncate max-w-xs">
+        <%= f.object.send(column.name).filename.to_s %>
+      </span>
+    <% else %>
+      <span class="text-gray-400 text-sm">No file chosen</span>
+    <% end %>
+  </div>
+
+  <% if f.object.send(column.name).attached? %>
+    <div class="mt-3">
+      <% if f.object.send(column.name).image? %>
+        <%= image_tag f.object.send(column.name).variant(resize_to_limit: [100, 100]), class: "rounded-lg shadow border" %>
+      <% else %>
+        <%= link_to "View File", url_for(f.object.send(column.name)), class: "text-blue-600 hover:underline" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
