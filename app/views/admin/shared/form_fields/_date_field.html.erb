@@ -1,4 +1,12 @@
 <div>
-  <label class="block text-gray-700 font-medium mb-1"><%= column.name.titleize %></label>
-  <%= f.date_field column.name, class: "border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-200 focus:border-blue-500" %>
+  <label class="block text-gray-700 font-medium mb-1">
+    <%= column.name.titleize %>
+    <% if required %>
+      <span class="text-red-500 ml-1">*</span>
+    <% end %>
+  </label>
+
+  <%= f.date_field column.name, 
+        required: required, 
+        class: "border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-200 focus:border-blue-500" %>
 </div>

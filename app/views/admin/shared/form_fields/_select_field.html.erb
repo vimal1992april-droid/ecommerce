@@ -1,10 +1,15 @@
 <% if column.name == "gender" %>
   <div>
-    <label class="block text-gray-700 font-medium mb-1"><%= column.name.titleize %></label>
+    <label class="block text-gray-700 font-medium mb-1">
+      <%= column.name.titleize %>
+      <% if required %>
+        <span class="text-red-500 ml-1">*</span>
+      <% end %>
+    </label>
     <div class="flex space-x-4">
       <% model_class.genders.keys.each do |g| %>
         <label class="inline-flex items-center space-x-2">
-          <%= f.radio_button column.name, g, class: "text-blue-600 focus:ring-blue-500" %>
+          <%= f.radio_button column.name, g, required: required, class: "text-blue-600 focus:ring-blue-500" %>
           <span class="text-gray-700"><%= g.titleize %></span>
         </label>
       <% end %>
@@ -12,6 +17,14 @@
   </div>
 <% else %>
   <% options = model_class.send(column.name.pluralize).keys.map { |k| [k.titleize, k] } %>
-  <%= f.select column.name, options, { prompt: "Select #{column.name.titleize}" },
-      class: "border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-200 focus:border-blue-500" %>
+  <div>
+    <label class="block text-gray-700 font-medium mb-1">
+      <%= column.name.titleize %>
+      <% if required %>
+        <span class="text-red-500 ml-1">*</span>
+      <% end %>
+    </label>
+    <%= f.select column.name, options, { prompt: "Select #{column.name.titleize}" },
+        { required: required, class: "border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-200 focus:border-blue-500" } %>
+  </div>
 <% end %>

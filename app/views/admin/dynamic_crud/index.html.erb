@@ -1,60 +1,140 @@
-<!-- app/views/admin/dynamic_crud/index.html.erb -->
 <div class="p-4 bg-gray-100 min-h-screen">
   <h1 class="text-2xl font-bold mb-4"><%= @model.name.pluralize %></h1>
 
   <!-- Action Buttons -->
-  <div class="flex gap-2 mb-4">
+  <div class="flex justify-between items-center mb-3">
     <% if @model.crud_options[:add] %>
-      <%= link_to "Add New #{@model}", admin_dynamic_crud_new_path(model: params[:model]), class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" %>
+      <%= link_to "Add New #{@model}",
+          admin_dynamic_crud_new_path(model: params[:model]),
+          class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" %>
     <% end %>
+      <!-- 🔍 Filter / Search Section -->
+    <div class="flex items-center justify-between">
+      <form method="get" action="">
+        <input type="hidden" name="model" value="<%= params[:model] %>">
+        <input type="hidden" name="col_page" value="<%= @col_page %>">
+        <input type="hidden" name="page" value="<%= @page %>">
 
+        <input
+          type="text"
+          name="query"
+          value="<%= params[:query] %>"
+          placeholder="Search..."
+          class="border border-gray-300 rounded p-2 focus:ring focus:ring-blue-200"
+        >
+        <button
+          type="submit"
+          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          Filter
+        </button>
+
+        <% if params[:query].present? %>
+          <%= link_to "Clear", admin_dynamic_crud_index_path(model: params[:model], page: @page, col_page: @col_page),
+              class: "ml-2 text-blue-600 hover:underline" %>
+        <% end %>
+      </form>
+    </div>
     <% if @model.crud_options[:import] %>
-      <%= link_to "Import CSV", admin_dynamic_crud_import_path(model: params[:model]), class: "px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600" %>
+      <%= link_to "Import CSV",
+          admin_dynamic_crud_import_path(model: params[:model]),
+          class: "px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600" %>
     <% end %>
 
     <% if @model.crud_options[:export] %>
-      <%= link_to "Export CSV", admin_dynamic_crud_export_path(model: params[:model]), class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" %>
+      <%= link_to "Export CSV",
+          admin_dynamic_crud_export_path(model: params[:model]),
+          class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" %>
     <% end %>
   </div>
 
-  <!-- Table -->
-  <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-    <table class="min-w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-        <tr>
-          <% @model.column_names.each do |col| %>
-            <th scope="col" class="px-6 py-3">
-              <%= col.humanize %>
-            </th>
-          <% end %>
 
-          <% if @model.crud_options[:edit] || @model.crud_options[:delete] %>
-            <th scope="col" class="px-6 py-3">Actions</th>
-          <% end %>
-        </tr>
-      </thead>
 
-      <tbody>
-        <% @resources.each_with_index do |r, index| %>
-          <tr class="<%= index.even? ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900' %> border-b dark:border-gray-700 border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <% @model.column_names.each_with_index do |col, i| %>
-              <td class="px-6 py-4 whitespace-nowrap text-sm <%= i == 0 ? 'font-medium text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300' %>">
-                <%= r.send(col) %>
-              </td>
+  <!-- Wrap table + navigation in the same turbo frame -->
+  <%= turbo_frame_tag "columns_table" do %>
+
+    <!-- Table Controls -->
+    <div class="flex justify-between items-center mb-3">
+      <% if @has_prev_col %>
+        <%= link_to "← Previous Columns",
+            admin_dynamic_crud_index_path(model: params[:model], page: @page, col_page: @col_page - 1, query: params[:query]),
+            class: "px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" %>
+      <% end %>
+
+      <% if @has_next_col %>
+        <%= link_to "Next Columns →",
+            admin_dynamic_crud_index_path(model: params[:model], page: @page, col_page: @col_page + 1, query: params[:query]),
+            class: "px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" %>
+      <% end %>
+    </div>
+
+    <!-- Table -->
+    <div class="relative bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+      <div class="overflow-x-auto">
+        <table class="min-w-full border-collapse table-fixed">
+          <thead class="bg-gray-50 border-b">
+            <tr>
+              <% @visible_columns.each do |col| %>
+                <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap max-w-[150px] truncate">
+                  <%= col.humanize %>
+                </th>
+              <% end %>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider sticky right-0 bg-gray-50 z-10">
+                Actions
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
+            <% @resources.each_with_index do |r, index| %>
+              <tr class="<%= index.even? ? 'bg-white' : 'bg-gray-50' %> hover:bg-blue-50 transition">
+                <% @visible_columns.each do |col| %>
+                  <% value = r.send(col) %>
+                  <td class="px-4 py-2 max-w-[150px] truncate whitespace-nowrap overflow-hidden text-ellipsis text-gray-800">
+                    <%= value.present? ? value : '-' %>
+                  </td>
+                <% end %>
+
+                <td class="px-4 py-2 whitespace-nowrap flex gap-3 sticky right-0 bg-white z-10">
+                  <% if @model.crud_options[:edit] %>
+                    <%= link_to "Edit",
+                        admin_dynamic_crud_edit_path(model: params[:model], id: r.id),
+                        class: "text-blue-600 hover:underline" %>
+                  <% end %>
+
+                  <% if @model.crud_options[:delete] %>
+                    <%= button_to "Delete",
+                        admin_dynamic_crud_destroy_path(model: params[:model], id: r.id),
+                        method: :delete,
+                        data: { confirm: "Are you sure?" },
+                        class: "text-red-600 hover:underline" %>
+                  <% end %>
+                </td>
+              </tr>
             <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
-              <% if @model.crud_options[:edit] %>
-                  <%= link_to "Edit", admin_dynamic_crud_edit_path(model: params[:model], id: r.id), class: "text-blue-600 dark:text-blue-500 hover:underline" %>
-              <% end %>
-              <% if @model.crud_options[:delete] %>
-                  <%= button_to "Delete", admin_dynamic_crud_destroy_path(model: params[:model], id: r.id), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 dark:text-red-500 hover:underline" %>
-              <% end %>
-             </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+    <!-- Pagination -->
+    <div class="flex justify-between mt-4">
+      <% if @page > 1 %>
+        <%= link_to "← Previous",
+            admin_dynamic_crud_index_path(model: params[:model], page: @page - 1, col_page: @col_page, query: params[:query]),
+            class: "px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" %>
+      <% else %>
+        <button class="px-4 py-2 bg-gray-100 rounded cursor-not-allowed" disabled>← Previous</button>
+      <% end %>
 
+      <span>Page <%= @page %> of <%= @total_pages %></span>
+
+      <% if @page < @total_pages %>
+        <%= link_to "Next →",
+            admin_dynamic_crud_index_path(model: params[:model], page: @page + 1, col_page: @col_page, query: params[:query]),
+            class: "px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" %>
+      <% else %>
+        <button class="px-4 py-2 bg-gray-100 rounded cursor-not-allowed" disabled>Next →</button>
+      <% end %>
+    </div>
+  <% end %>
 </div>

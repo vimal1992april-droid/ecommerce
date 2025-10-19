@@ -22,6 +22,7 @@
       <div class="grid grid-cols-2 gap-4">
 
         <% @model_class.columns.each do |column| %>
+          <% required = !column.null && column.default.nil? %>
           <% next if ["id", "created_at", "updated_at"].include?(column.name) %>
 
           <% field_type = 
@@ -48,7 +49,7 @@
             end
           %>
 
-          <%= render "admin/shared/form_fields/#{field_type}", f: f, column: column, model_class: @model_class %>
+          <%= render "admin/shared/form_fields/#{field_type}", f: f, column: column, model_class: @model_class, required: required %>
         <% end %>
 
         <div class="flex justify-end mt-6">

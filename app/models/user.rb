@@ -6,10 +6,11 @@ class User < ApplicationRecord
 	    	add: true,
 			edit: true,
 			delete: true,
-			import: false,   # hide import
-			export: false    # hide export
+			import: true,   # hide import
+			export: true    # hide export
 	    }
 	end
+
 
 	belongs_to :country, optional: true
 
@@ -20,6 +21,10 @@ class User < ApplicationRecord
 	validates :salary, numericality: true, allow_nil: true
 
 	has_one_attached :profile_picture # for Active Storage uploads
+
+	def self.hidden_columns
+	   %w[password_digest password created_at updated_at]
+	end
 end
 
 

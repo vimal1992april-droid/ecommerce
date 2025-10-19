@@ -1,12 +1,15 @@
 <div>
   <label class="block text-gray-700 font-medium mb-2">
     <%= column.name.titleize %>
+    <% if required %>
+      <span class="text-red-500 ml-1">*</span>
+    <% end %>
   </label>
 
   <div class="flex items-center space-x-3">
     <label class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm transition">
       Choose File
-      <%= f.file_field column.name, direct_upload: true, class: "hidden" %>
+      <%= f.file_field column.name, required: required, direct_upload: true, class: "hidden" %>
     </label>
 
     <% if f.object.send(column.name).attached? %>
