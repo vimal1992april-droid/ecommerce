@@ -60,3 +60,35 @@
     <% end %>
   </div>
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Find any input that looks like a "name" field
+    const nameInputs = document.querySelectorAll('input[name$="[name]"]');
+
+    nameInputs.forEach((nameInput) => {
+      // Try to find a matching slug input in the same form
+      const form = nameInput.closest("form");
+      const slugInput = form?.querySelector('input[name$="[slug]"]');
+      if (!slugInput) return;
+
+      let userEdited = false;
+
+      // If user edits slug manually, stop auto-filling
+      slugInput.addEventListener("input", () => {
+        userEdited = true;
+      });
+
+      // Auto-fill slug dynamically
+      nameInput.addEventListener("input", () => {
+        if (userEdited) return;
+        const slug = nameInput.value
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "_")       // replace spaces with underscores
+          .replace(/[^a-z0-9_]/g, ""); // remove non-alphanumeric chars
+        slugInput.value = slug;
+      });
+    });
+  });
+
+</script>

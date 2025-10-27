@@ -31,7 +31,7 @@ class Admin::DynamicCrudController < ApplicationController
     @has_next_col = start_index + per_page < all_columns.size
 
     # --- Row pagination setup ---
-    row_per_page = 10
+    row_per_page = 20
     @page = (params[:page] || 1).to_i
     @total_pages = (@resources.count / row_per_page.to_f).ceil
     @resources = @resources.offset((@page - 1) * row_per_page).limit(row_per_page)

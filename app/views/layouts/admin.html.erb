@@ -47,6 +47,19 @@
             <i class="fa-solid fa-gauge mr-2"></i> Dashboard
           <% end %>
 
+          <!-- Dynamic model links -->
+          <% all_models.each do |model| %>
+            <% model_name = model.name.underscore.pluralize %>
+            <% icon_class = model_icon(model.name) %>
+
+            <%= link_to "/admin/#{model_name}",
+                        class: "flex items-center p-2 rounded hover:bg-gray-800 #{current_page?("/admin/#{model_name}") ? 'bg-gray-800' : ''}" do %>
+              <i class="fa-solid <%= icon_class %> mr-2"></i>
+              <span><%= model.name.titleize %></span>
+            <% end %>
+          <% end %>
+
+
           <%= button_to destroy_admin_session_path, method: :delete,
                         class: "flex items-center p-2 rounded hover:bg-gray-800 text-red-400 w-full text-left" do %>
             <i class="fa-solid fa-right-from-bracket mr-2"></i>
