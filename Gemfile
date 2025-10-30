@@ -51,7 +51,7 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
-  gem 'faker', '~> 2.23'
+  gem 'faker', '~> 3.5'
   gem 'dotenv-rails'
 end
 
