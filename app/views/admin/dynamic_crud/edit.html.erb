@@ -2,7 +2,7 @@
   <div class="mx-auto bg-white shadow rounded-lg p-6 border border-gray-200">
 
     <h1 class="text-2xl font-semibold text-gray-800 mb-6">
-      Add <%= params[:model].titleize %>
+      Edit <%= params[:model].titleize %>
     </h1>
 
     <% if @resource.errors.any? %>
@@ -17,8 +17,8 @@
         </ul>
       </div>
     <% end %>
-
-    <%= form_with(model: @resource, url: admin_dynamic_crud_create_path(model: params[:model]), local: true, html: { multipart: true }) do |f| %>
+    
+    <%= form_with(model: @resource, url: admin_dynamic_crud_update_path(model: params[:model], id: @resource.id), method: :patch, local: true, html: { multipart: true }) do |f| %>
       <div class="grid grid-cols-2 gap-4">
 
         <% @model_class.columns.each do |column| %>
@@ -49,46 +49,19 @@
             end
           %>
 
-          <%= render "admin/shared/form_fields/#{field_type}", f: f, column: column, model_class: @model_class, required: required %>
+          <%= render "admin/shared/form_fields/#{field_type}", 
+                f: f, 
+                column: column, 
+                model_class: @model_class, 
+                required: required, 
+                resource: @resource %>
         <% end %>
 
         <div class="flex justify-end mt-6">
-          <%= f.submit "Create #{params[:model].titleize}", class: "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition" %>
+          <%= f.submit "Update #{params[:model].titleize}", class: "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition" %>
         </div>
 
       </div>
     <% end %>
   </div>
 </div>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Find any input that looks like a "name" field
-    const nameInputs = document.querySelectorAll('input[name$="[name]"]');
-
-    nameInputs.forEach((nameInput) => {
-      // Try to find a matching slug input in the same form
-      const form = nameInput.closest("form");
-      const slugInput = form?.querySelector('input[name$="[slug]"]');
-      if (!slugInput) return;
-
-      let userEdited = false;
-
-      // If user edits slug manually, stop auto-filling
-      slugInput.addEventListener("input", () => {
-        userEdited = true;
-      });
-
-      // Auto-fill slug dynamically
-      nameInput.addEventListener("input", () => {
-        if (userEdited) return;
-        const slug = nameInput.value
-          .toLowerCase()
-          .trim()
-          .replace(/\s+/g, "_")       // replace spaces with underscores
-          .replace(/[^a-z0-9_]/g, ""); // remove non-alphanumeric chars
-        slugInput.value = slug;
-      });
-    });
-  });
-
-</script>

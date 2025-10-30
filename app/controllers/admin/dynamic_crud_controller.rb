@@ -57,13 +57,19 @@ class Admin::DynamicCrudController < ApplicationController
     end
   end
 
-  def edit; end
+  def edit
+    @model_class = params[:model].classify.constantize
+    @resource = @model_class.find(params[:id])
+  end
 
   def update
-    if @resource.update(resource_params)
+    @model_class = params[:model].classify.constantize
+    @resource = @model_class.find(params[:id])
+
+    if @resource.update(permitted_params)
       redirect_to admin_dynamic_crud_index_path(model: params[:model]), notice: "#{@model} updated successfully."
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -72,8 +78,67 @@ class Admin::DynamicCrudController < ApplicationController
     redirect_to admin_dynamic_crud_index_path(model: params[:model]), notice: "#{@model} deleted successfully."
   end
 
+  def sample_csv
+    require "csv"
+
+    model_class = params[:model].classify.constantize
+    attributes = model_class.column_names - ["id", "created_at", "updated_at"]
+
+    csv_data = CSV.generate(headers: true) do |csv|
+      # Add header row
+      csv << attributes
+
+      # Add up to 5 existing records if available
+      if model_class.exists?
+        model_class.limit(5).each do |record|
+          csv << attributes.map do |attr|
+            value = record.send(attr)
+            case value
+            when ActiveStorage::Attached::One
+              value.attached? ? url_for(value) : ""
+            else
+              value
+            end
+          end
+        end
+      else
+        # Add an empty example row if no data present
+        csv << Array.new(attributes.size, "")
+      end
+    end
+
+    send_data csv_data,
+              filename: "#{params[:model]}_sample.csv",
+              type: "text/csv"
+  end
+
+
   def import
-    # dynamic import logic
+    uploaded_file = params[:file]
+    model_name = params[:model]
+    file_content = uploaded_file.read
+    original_filename = uploaded_file.original_filename
+    
+    ImportModelDataJob.perform_later(model_name, file_content, original_filename)
+    render json: { status: "ok" }
+  end
+
+  def import_progress
+    model_name = params[:model]
+    progress = Rails.cache.read("import_progress_#{model_name}") || { status: "pending", progress: 0 }
+
+    render json: progress
+  end
+
+  def sample
+    model = params[:model].constantize
+    headers = model.column_names - ["id", "created_at", "updated_at"]
+
+    csv_data = CSV.generate(headers: true) do |csv|
+      csv << headers
+    end
+
+    send_data csv_data, filename: "#{model.name.downcase}_sample.csv"
   end
 
   def export
@@ -117,5 +182,11 @@ class Admin::DynamicCrudController < ApplicationController
 
   def model_class(name)
     name.classify.constantize
+  end
+
+  def permitted_params
+    model_key = params[:model].singularize.underscore
+    allowed = @model_class.column_names - %w[id created_at updated_at]
+    params.require(model_key).permit(allowed.map(&:to_sym))
   end
 end

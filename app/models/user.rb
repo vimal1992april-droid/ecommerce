@@ -13,7 +13,8 @@ class User < ApplicationRecord
 
 
 	belongs_to :country, optional: true
-
+	belongs_to :role
+	
 	enum :gender, { male: 0, female: 1, other: 2 }
 
 	validates :role, presence: true

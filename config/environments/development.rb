@@ -71,5 +71,6 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
   # config/environments/development.rb
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+  config.active_job.use_signed_global_id = false
 
 end

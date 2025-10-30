@@ -1,4 +1,4 @@
-<div>
+<div data-controller="file-preview">
   <label class="block text-gray-700 font-medium mb-2">
     <%= column.name.titleize %>
     <% if required %>
@@ -9,25 +9,29 @@
   <div class="flex items-center space-x-3">
     <label class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm transition">
       Choose File
-      <%= f.file_field column.name, required: required, direct_upload: true, class: "hidden" %>
+      <%= f.file_field column.name,
+          required: required,
+          direct_upload: true,
+          class: "hidden",
+          data: { file_preview_target: "input", action: "change->file-preview#preview" } %>
     </label>
 
-    <% if f.object.send(column.name).attached? %>
-      <span class="text-gray-600 text-sm truncate max-w-xs">
+    <span data-file-preview-target="filename" class="text-gray-400 text-sm">
+      <% if f.object.send(column.name).attached? %>
         <%= f.object.send(column.name).filename.to_s %>
-      </span>
-    <% else %>
-      <span class="text-gray-400 text-sm">No file chosen</span>
-    <% end %>
+      <% else %>
+        No file chosen
+      <% end %>
+    </span>
   </div>
 
-  <% if f.object.send(column.name).attached? %>
-    <div class="mt-3">
-      <% if f.object.send(column.name).image? %>
-        <%= image_tag f.object.send(column.name).variant(resize_to_limit: [100, 100]), class: "rounded-lg shadow border" %>
-      <% else %>
-        <%= link_to "View File", url_for(f.object.send(column.name)), class: "text-blue-600 hover:underline" %>
-      <% end %>
-    </div>
-  <% end %>
+  <div class="mt-3">
+    <% if f.object.send(column.name).attached? && f.object.send(column.name).image? %>
+      <%= image_tag f.object.send(column.name).variant(resize_to_limit: [100, 100]),
+          class: "rounded-lg shadow border max-h-24",
+          data: { file_preview_target: "preview" } %>
+    <% else %>
+      <img data-file-preview-target="preview" class="hidden rounded-lg shadow border max-h-24" />
+    <% end %>
+  </div>
 </div>

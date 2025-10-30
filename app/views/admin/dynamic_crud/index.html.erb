@@ -12,7 +12,7 @@
       <% end %>
       <% if @model.crud_options[:import] %>
         <%= link_to "Import CSV",
-            admin_dynamic_crud_import_path(model: params[:model]),
+            admin_dynamic_crud_import_page_path(model: params[:model]),
             class: "px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600" %>
       <% end %>
 
@@ -91,17 +91,40 @@
             <% @resources.each_with_index do |r, index| %>
               <tr class="<%= index.even? ? 'bg-white' : 'bg-gray-50' %> hover:bg-blue-50 transition">
                 <% @visible_columns.each do |col| %>
-                  <% value = r.send(col) %>
-                  <td class="px-4 py-2 max-w-[150px] truncate whitespace-nowrap overflow-hidden text-ellipsis text-gray-800">
-                    <%= value.present? ? value : '-' %>
+                  <% value = r.send(col) rescue nil %>
+                  <% display_value = value %>
+
+                  <%# --- Detect foreign key and show name/title --- %>
+                  <% if col.end_with?("_id") %>
+                    <% assoc_name = col.sub("_id", "") %>
+                    <% assoc = r.send(assoc_name) rescue nil %>
+                    <% if assoc.present? %>
+                      <% display_value = assoc.try(:name) || assoc.try(:title) || assoc.id %>
+                    <% end %>
+
+                  <%# --- Detect Active Storage attachments and show thumbnails --- %>
+                  <% elsif r.respond_to?(col) && r.send(col).respond_to?(:attached?) && r.send(col).attached? %>
+                    <% attachment = r.send(col) %>
+                    <% if attachment.image? %>
+                      <% display_value = image_tag(attachment.variant(resize_to_limit: [80, 80])) %>
+                    <% else %>
+                      <% display_value = link_to "Download", rails_blob_path(attachment, disposition: "attachment") %>
+                    <% end %>
+                  <% end %>
+
+                  <td class="px-4 py-2 max-w-[150px] truncate whitespace-nowrap overflow-hidden text-ellipsis text-gray-800 ">
+                    <%= display_value.present? ? display_value : '-' %>
                   </td>
                 <% end %>
+
+
 
                 <td class="px-4 py-2 whitespace-nowrap flex gap-3 sticky right-0 bg-white z-1">
                   <% if @model.crud_options[:edit] %>
                     <%= link_to "Edit",
                         admin_dynamic_crud_edit_path(model: params[:model], id: r.id),
-                        class: "text-blue-600 hover:underline" %>
+                        class: "text-blue-600 hover:underline",
+                        data: { turbo: false } %>
                   <% end %>
 
                   <% if @model.crud_options[:delete] %>

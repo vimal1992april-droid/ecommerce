@@ -10,4 +10,5 @@ class Role < ApplicationRecord
 			export: true    # hide export
 	    }
 	end
+	has_many :users
 end

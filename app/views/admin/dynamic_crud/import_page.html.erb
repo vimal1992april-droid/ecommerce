@@ -1,0 +1,102 @@
+<div class="p-6 bg-gray-100 min-h-screen">
+
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Import <%= params[:model].titleize %> Data</h1>
+
+    <%= link_to admin_dynamic_crud_sample_csv_path(model: params[:model]),
+                class: "bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition",
+                data: { turbo: false } do %>
+      <i class="fa-solid fa-file-arrow-down mr-2"></i>
+      Download Sample CSV
+    <% end %>
+  </div>
+
+  <%= form_with url: admin_dynamic_crud_import_path(model: params[:model]), 
+                multipart: true, 
+                local: true, 
+                id: "importForm",
+                data: { import_mapping_target: "form" } do |f| %>
+
+    <div>
+      <label class="block text-gray-700 font-medium mb-2">Upload CSV File</label>
+      <%= f.file_field :file, required: true,
+          class: "border border-gray-300 rounded px-4 py-2 w-full bg-white",
+          data: { action: "change->import-mapping#preview" } %>
+    </div>
+
+    <div id="mapping-container" class="mt-6 hidden bg-white rounded-lg p-4 shadow" data-import-mapping-target="mappingContainer">
+      <h2 class="font-semibold text-lg mb-3">Field Mapping</h2>
+      <p class="text-sm text-gray-500 mb-3">Select which CSV columns map to your database fields.</p>
+
+      <table class="w-full border border-gray-300 rounded">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="p-2 border">CSV Column</th>
+            <th class="p-2 border">Model Attribute</th>
+          </tr>
+        </thead>
+        <tbody id="mapping-body" data-import-mapping-target="mappingBody"></tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-between mt-6">
+      <%= f.submit "Start Import", class: "bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700" %>
+      <a href="<%= admin_dynamic_crud_index_path(model: params[:model]) %>" class="text-gray-600 hover:underline">Cancel</a>
+    </div>
+  <% end %>
+
+  <div id="progressContainer" class="hidden mt-4">
+    <p>Import Progress: <span id="progressPercent">0</span>%</p>
+    <div class="w-full bg-gray-200 rounded-full h-4 mt-1">
+      <div id="progressBar" class="bg-green-500 h-4 rounded-full w-0 transition-all duration-300"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("importForm");
+    const progressContainer = document.getElementById("progressContainer");
+    const progressBar = document.getElementById("progressBar");
+    const progressPercent = document.getElementById("progressPercent");
+    const model = "<%= params[:model] %>";
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      progressContainer.classList.remove("hidden");
+      progressBar.style.width = "0%";
+      progressPercent.textContent = "0";
+
+      const formData = new FormData(form);
+
+      fetch(form.action, { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(() => {
+          const interval = setInterval(() => {
+            fetch(`/admin/${model}/import_progress`)
+              .then(res => {
+                if (!res.ok) throw new Error("Progress endpoint not found");
+                return res.json();
+              })
+              .then(data => {
+                progressBar.style.width = `${data.progress}%`;
+                progressPercent.textContent = data.progress;
+
+                if (data.progress >= 100) {
+                  clearInterval(interval);
+                  progressPercent.textContent = "Completed ✅";
+                }
+              })
+              .catch(err => {
+                console.error("Progress check failed:", err);
+                clearInterval(interval);
+              });
+          }, 2000);
+        })
+        .catch(err => {
+          console.error("Import failed:", err);
+        });
+    });
+  });
+</script>
