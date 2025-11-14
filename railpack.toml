@@ -1,0 +1,17 @@
+[php]
+version = "8.2"
+
+[php.extensions]
+pdo = true
+pdo_mysql = true
+mbstring = true
+openssl = true
+tokenizer = true
+xml = true
+curl = true
+ctype = true
+fileinfo = true
+json = true
+
+[laravel]
+skip_commands = ["view:cache", "config:cache", "route:cache"]
