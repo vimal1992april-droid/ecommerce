@@ -28,10 +28,21 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrap();
 
-        $generalSetting = GeneralSetting::first();
-        $logoSetting = LogoSetting::first();
-        $mailSetting = EmailConfiguration::first();
-        $pusherSetting = PusherSetting::first();
+        // Prevent DB queries during build/console commands
+        if (app()->runningInConsole()) {
+            return;
+        }
+
+        try {
+            $generalSetting = GeneralSetting::first();
+            $logoSetting = LogoSetting::first();
+            $mailSetting = EmailConfiguration::first();
+            $pusherSetting = PusherSetting::first();
+        } catch (\Throwable $e) {
+            // If DB not ready, skip
+            return;
+        }
+
         /** set time zone */
         Config::set('app.timezone', $generalSetting->time_zone);
 
@@ -46,13 +57,16 @@ class AppServiceProvider extends ServiceProvider
         Config::set('broadcasting.connections.pusher.key', $pusherSetting->pusher_key);
         Config::set('broadcasting.connections.pusher.secret', $pusherSetting->pusher_secret);
         Config::set('broadcasting.connections.pusher.app_id', $pusherSetting->pusher_app_id);
-        Config::set('broadcasting.connections.pusher.options.host', "api-".$pusherSetting->pusher_cluster.".pusher.com");
+        Config::set('broadcasting.connections.pusher.options.host', "api-" . $pusherSetting->pusher_cluster . ".pusher.com");
 
-
-
-        /** Share variable at all view */
+        /** Share at all views */
         View::composer('*', function($view) use ($generalSetting, $logoSetting, $pusherSetting){
-            $view->with(['settings' => $generalSetting, 'logoSetting' => $logoSetting, 'pusherSetting' => $pusherSetting]);
+            $view->with([
+                'settings' => $generalSetting,
+                'logoSetting' => $logoSetting,
+                'pusherSetting' => $pusherSetting
+            ]);
         });
     }
+
 }
