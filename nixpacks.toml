@@ -1,4 +1,3 @@
-# Use PHP buildpack
 [phases.setup]
 nixPkgs = [
   "php82",
@@ -11,13 +10,11 @@ nixPkgs = [
   "php82Extensions.fileinfo"
 ]
 
-# Composer install (safe)
 [phases.install]
 cmds = [
   "composer install --no-dev --optimize-autoloader"
 ]
 
-# Disable Laravel caching commands (because they break build)
 [phases.build]
 cmds = [
   "php artisan view:clear",
@@ -25,6 +22,9 @@ cmds = [
   "php artisan route:clear"
 ]
 
-# Final start command
+# IMPORTANT PART: run migrations on container start
 [start]
-cmd = "php artisan serve --host 0.0.0.0 --port $PORT"
+cmd = """
+php artisan migrate --force &&
+php artisan serve --host 0.0.0.0 --port $PORT
+"""
