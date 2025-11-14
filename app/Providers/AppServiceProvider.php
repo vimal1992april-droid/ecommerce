@@ -28,10 +28,22 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrap();
 
-        $generalSetting = GeneralSetting::first();
-        $logoSetting = LogoSetting::first();
-        $mailSetting = EmailConfiguration::first();
-        $pusherSetting = PusherSetting::first();
+        // If we are running during build, config:cache, route:cache, view:cache 
+        // → do NOT run DB queries
+        if (app()->runningInConsole()) {
+            return;
+        }
+
+        try {
+            $generalSetting = GeneralSetting::first();
+            $logoSetting = LogoSetting::first();
+            $mailSetting = EmailConfiguration::first();
+            $pusherSetting = PusherSetting::first();
+        } catch (\Exception $e) {
+            // If database is still not ready
+            return;
+        }
+
         /** set time zone */
         Config::set('app.timezone', $generalSetting->time_zone);
 
@@ -46,13 +58,16 @@ class AppServiceProvider extends ServiceProvider
         Config::set('broadcasting.connections.pusher.key', $pusherSetting->pusher_key);
         Config::set('broadcasting.connections.pusher.secret', $pusherSetting->pusher_secret);
         Config::set('broadcasting.connections.pusher.app_id', $pusherSetting->pusher_app_id);
-        Config::set('broadcasting.connections.pusher.options.host', "api-".$pusherSetting->pusher_cluster.".pusher.com");
+        Config::set('broadcasting.connections.pusher.options.host', "api-" . $pusherSetting->pusher_cluster . ".pusher.com");
 
-
-
-        /** Share variable at all view */
-        View::composer('*', function($view) use ($generalSetting, $logoSetting, $pusherSetting){
-            $view->with(['settings' => $generalSetting, 'logoSetting' => $logoSetting, 'pusherSetting' => $pusherSetting]);
+        /** Share variables to all views */
+        View::composer('*', function ($view) use ($generalSetting, $logoSetting, $pusherSetting) {
+            $view->with([
+                'settings' => $generalSetting,
+                'logoSetting' => $logoSetting,
+                'pusherSetting' => $pusherSetting
+            ]);
         });
     }
+
 }
