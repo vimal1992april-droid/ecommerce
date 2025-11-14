@@ -1,0 +1,30 @@
+# Use PHP buildpack
+[phases.setup]
+nixPkgs = [
+  "php82",
+  "php82Extensions.pdo",
+  "php82Extensions.pdo_mysql",
+  "php82Extensions.mbstring",
+  "php82Extensions.tokenizer",
+  "php82Extensions.xml",
+  "php82Extensions.curl",
+  "php82Extensions.fileinfo"
+]
+
+# Composer install (safe)
+[phases.install]
+cmds = [
+  "composer install --no-dev --optimize-autoloader"
+]
+
+# Disable Laravel caching commands (because they break build)
+[phases.build]
+cmds = [
+  "php artisan view:clear",
+  "php artisan config:clear",
+  "php artisan route:clear"
+]
+
+# Final start command
+[start]
+cmd = "php artisan serve --host 0.0.0.0 --port $PORT"
